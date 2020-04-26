@@ -1,7 +1,7 @@
 #include <GL/glut.h>
 #include <stdio.h>
 
-float angulo = 0.0;
+//float angulo = 0.0;
 float limiteXpositivo = 40.0;
 float limiteYpositivo = 40.0;
 float limiteXnegativo = -40.0;
@@ -12,7 +12,8 @@ float EjeXizquierdo = 0.0;
 float EjeYizquierdo = 0.0;
 float red= 0.0, green=0.0, blue=0.0;
 int aux =0;
-
+bool salto, agacha, pasoDer, pasoIzq, libre = true;
+float traslacionX=20, traslacionY=10, angulo=24;
 float traslacionXizquierda = -30.0;
 float traslacionYizquierda = 0.0;
 float traslacionXderecha = 30.0;
@@ -1989,7 +1990,24 @@ glPopMatrix();
 
 
 
-
+if (libre){
+        // Agregar aqui animacion cuando esta libre
+    }
+    if (salto) {
+        glTranslatef(0,traslacionY,0);
+    }
+    if (agacha) {
+        glScalef(1,.5,1);
+        glTranslatef(0,-traslacionY,0);
+    }
+    if (pasoDer) {
+        glTranslatef(traslacionX,0,0);
+        glRotatef(-angulo,0,0,1);
+    }
+    if (pasoIzq) {
+        glTranslatef(-traslacionX,0,0);
+        glRotatef(angulo,0,0,1);
+    }
 
 
 
@@ -2438,15 +2456,32 @@ void redimensionar(int w, int h)
 
 }
 
-void manejarTeclado(unsigned char key,int x, int y)
-{
-    switch(key)
-    {
-        case 'a':   angulo = angulo + 5;
-                    break;
-        case 'b':   angulo = angulo - 5;
-                    break;
+void regresarPosicion(int i){
+    salto = false;
+    agacha = false;
+    pasoDer = false;
+    pasoIzq = false;
+    libre = true;
+    glutPostRedisplay();
+}
+
+void manejarTeclado(unsigned char key,int x, int y){
+    switch(key){
+        case 'a':
+        pasoIzq = true;
+        break;
+        case 'd':
+        pasoDer = true;
+        break;
+        case 'w':
+        salto = true;
+        break;
+        case 's':
+        agacha = true;
+        break;
     }
+    libre = false;
+    glutTimerFunc(200,regresarPosicion,0);
     glutPostRedisplay();
 }
 
@@ -2543,7 +2578,7 @@ int main(int argc, char** argv)
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(600,400);
     glutInitWindowPosition(100,200);
-    glutCreateWindow("CHRISTIAN VP");
+    glutCreateWindow("COGRAVI GRUPAL SEMANA 04");
     inicializar();
 
     glutDisplayFunc(graficar);
