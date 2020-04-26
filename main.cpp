@@ -1,26 +1,13 @@
 #include <GL/glut.h>
-#include <stdio.h>
+bool salto, agacha, pasoDer, pasoIzq, libre = true;
+float traslacionX=20, traslacionY=10, angulo=24;
+int aux=0;
 
-float angulo = 0.0;
-float limiteXpositivo = 40.0;
-float limiteYpositivo = 40.0;
-float limiteXnegativo = -40.0;
-float limiteYnegativo = -40.0;
-float limiteAuxX = 0.0;
-float limiteAuxY = 0.0;
-float red= 0.0, green=0.0, blue=0.0;
-int aux =0;
-
-float traslacionX = 20.0;
-float traslacionY = 20.0;
-
-void inicializar()
-{
+void inicializar(){
     glClearColor(1.0,1.0,1.0,1.0);
 }
 
-void graficarEjes()
-{
+void graficarEjes(){
     glColor3f(0,0,0);
     glBegin(GL_LINES);
         glVertex2f(-50,0);
@@ -30,25 +17,32 @@ void graficarEjes()
     glEnd();
 }
 
-void graficar()
-{
-
+void graficar(){
     glClear(GL_COLOR_BUFFER_BIT);
-
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
     graficarEjes();
 
+    if (libre){
+        // Agregar aqui animacion cuando esta libre
+    }
+    if (salto) {
+        glTranslatef(0,traslacionY,0);
+    }
+    if (agacha) {
+        glScalef(1,.5,1);
+        glTranslatef(0,-traslacionY,0);
+    }
+    if (pasoDer) {
+        glTranslatef(traslacionX,0,0);
+        glRotatef(-angulo,0,0,1);
+    }
+    if (pasoIzq) {
+        glTranslatef(-traslacionX,0,0);
+        glRotatef(angulo,0,0,1);
+    }
 
-     //glTranslatef(traslacionX,traslacionY,0);
-
-
-
-    //glScalef(0.5,2,1);
-    //glRotatef(angulo,0,0,1);
-
-
+    glRotatef(0,0,0,1);
 
     glColor3f(0.57, 0.78, 0.90);
     glBegin(GL_TRIANGLES);
@@ -173,10 +167,8 @@ void graficar()
         glVertex2f(7.8,1.9);
     glEnd();
 
-    //Brazo Derecho
-
     glColor3f(0.55, 0.74, 0.89);
-    glBegin(GL_TRIANGLES);
+    glBegin(GL_TRIANGLES);    //Brazo Derecho
         glVertex2f(5.7,1.9);
         glVertex2f(5.2,3.8);
         glVertex2f(10.3,1.8);
@@ -219,7 +211,6 @@ void graficar()
 
 
     //Brazo Derecho End
-
 
     //Brazo Izquierdo
 
@@ -345,7 +336,6 @@ void graficar()
         glVertex2f(-3.2, 11.9);
     glEnd();
 
-
     glColor3f(0.11, 0.20, 0.45);
     glBegin(GL_TRIANGLES);
         glVertex2f(4.0, 11.0);
@@ -405,7 +395,6 @@ void graficar()
         glVertex2f(-1.4, 11.1);
         glVertex2f(-1, 11.6);
     glEnd();
-
 
     //NARIZ
     glColor3f(0.13, 0.21, 0.50);
@@ -482,58 +471,54 @@ void graficar()
     glFlush();
 }
 
-void redimensionar(int w, int h)
-{
+void redimensionar(int w, int h){
     glViewport(0,0,w,h);
-
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-50,50,-50,50,-1,1);
-
 }
 
-void manejarTeclado(unsigned char key,int x, int y)
-{
-    switch(key)
-    {
-        case 'a':   angulo = angulo + 5;
-                    break;
-        case 'b':   angulo = angulo - 5;
-                    break;
+void regresarPosicion(int i){
+    salto = false;
+    agacha = false;
+    pasoDer = false;
+    pasoIzq = false;
+    libre = true;
+    glutPostRedisplay();
+}
+
+void manejarTeclado(unsigned char key,int x, int y){
+    switch(key){
+        case 'a':
+        pasoIzq = true;
+        break;
+        case 'd':
+        pasoDer = true;
+        break;
+        case 'w':
+        salto = true;
+        break;
+        case 's':
+        agacha = true;
+        break;
     }
+    libre = false;
+    glutTimerFunc(200,regresarPosicion,0);
     glutPostRedisplay();
 }
 
-void rotarTriangulo(int i)
-{
-    angulo = angulo + 5;
-    glutPostRedisplay();
-    glutTimerFunc(500,rotarTriangulo,1);
-}
-void trasladarEnX(int i)
-{
 
-}
-
-
-
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv){
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(600,400);
     glutInitWindowPosition(100,200);
-    glutCreateWindow("CHRISTIAN VP");
+    glutCreateWindow("COGRAVI GRUPAL SEMANA 04");
     inicializar();
 
     glutDisplayFunc(graficar);
     glutReshapeFunc(redimensionar);
     glutKeyboardFunc(manejarTeclado);
-
-    glutTimerFunc(500,rotarTriangulo,1);
-
-    glutTimerFunc(20,trasladarEnX,2);
-
 
     glutMainLoop();
 
